@@ -1,0 +1,217 @@
+Step1:
+--Step 1: What are te Data Science Average Salary?
+
+
+Step 2:
+-- I thought a lot and came up with the result of my question, having this simplicity to discover the average
+--salary between Data Science positions, ad hoc showed me that any simple query that I write is not part of 
+--something fixed but rather is information saved in the SQL cache for a short period of time,
+--and that my next step should be to validate the result of my query usind procedures to start creating fixed
+--and fast queries which is also called stored procedures.
+-- I see that ad hocs and stored procedures are the opposite from each other.
+-- Stored procedures allows me to enshorten all my coding pages.
+
+
+Step 3:
+--There are 132 different averages for each Job title found in our query
+-- The total AVG is $145560,5585 USD
+
+--Ad Hoc:
+-- Average per Title:
+Select 
+	Job_Title,
+	AVG(salary_in_usd) as SalaryAvg
+From [dbo].[data_science_salaries2024]
+Group by Job_Title
+Order BY SalaryAvg desc
+-- Total Average:
+Select 
+AVG(salary_in_usd) as SalaryAvg
+From [dbo].[data_science_salaries2024]
+
+Select * From [dbo].[data_science_salaries2024]
+
+
+Step 4:
+Drop View if Exists V_AvgSalaries;
+Go
+
+Create View V_AvgSalaries
+AS
+
+/*****************************************************************************************************************
+NAME:  Data_Science_MM
+PURPOSE: Showcase the creation of table views
+
+MODIFICATION LOG:
+Ver      Date        Author        Description
+-----   ----------   -----------   -------------------------------------------------------------------------------
+1.0     01/30/2025   MORONI            1. Script for EC_IT143_DA W4.2 Step 4 
+				          	 MIRANDOLLI
+
+RUNTIME: 
+1s
+
+NOTES: 
+This script was created to help me always remember how to perform the following command in SQL Server as well as to 
+present my school work to teachers and the like
+ 
+******************************************************************************************************************/
+
+-- Q1: How do I create a Table View within SQL Server Management using my Ad Hoc queries?
+-- A1: I will show how easy it is to create a table view and its purpose is simply to help you show your
+--queries workload to anyone else without harming your coding, that's because they will only see the
+--information in View mode and any change of the data will be not permanent.
+
+--Table View
+	Select top 132
+	Job_Title,
+	AVG(salary_in_usd) as SalaryAvg
+From [dbo].[data_science_salaries2024]
+Group by Job_Title
+Order BY SalaryAvg desc;
+
+SELECT GETDATE() AS my_date;
+
+-- Once I create a view, all I need to do is run the name of this view and it will getall the results from
+--the code I created earlier.
+-- The View itself is a table for visualization purposes only.
+
+
+Step 5.1:
+Select * Into AVG_Title_Table From V_AvgSalaries
+
+Select * From AVG_Title_Table
+
+
+Step 5.2:
+USE [EC_IT143_DA]
+GO
+
+/****** Object:  Table [dbo].[AVG_Title_Table]    Script Date: 31/01/2025 10:23:11 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+--Drop table [dbo].[AVG_Title_Table]
+
+CREATE TABLE [dbo].[AVG_Title_Table](
+	[Job_Title] [varchar](40) Primary Key NOT NULL,
+	[SalaryAvg] [money] NOT NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+
+Step 6:
+USE [EC_IT143_DA]
+GO
+
+/****** Object:  View [dbo].[Non_A_Customers]    Script Date: 30/01/2025 22:16:58 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+Create View [dbo].[V_AvgSalaries]
+AS
+
+/*****************************************************************************************************************
+NAME:  Data_Science_MM
+PURPOSE: Showcase the creation of table views
+
+MODIFICATION LOG:
+Ver      Date        Author        Description
+-----   ----------   -----------   -------------------------------------------------------------------------------
+1.0     01/30/2025   MORONI            1. Script for EC_IT143_DA W4.2 Step 4 
+					 MIRANDOLLI
+
+RUNTIME: 
+1s
+
+NOTES: 
+This script was created to help me always remember how to perform the following command in SQL Server as well as to 
+present my school work to teachers and the like
+ 
+******************************************************************************************************************/
+
+-- Q1: How do I create a Table View within SQL Server Management using my Ad Hoc queries?
+-- A1: I will show how easy it is to create a table view and its purpose is simply to help you show your queries 
+--workload to anyone else without harming your coding, that's because they will only see the information in View mode
+--and any change of the data will be not permanent.
+
+--Table View
+Select top 132
+	Job_Title,
+	AVG(salary_in_usd) as SalaryAvg
+	From [dbo].[data_science_salaries2024]
+		Group by Job_Title
+		Order BY SalaryAvg desc;
+GO
+
+-- Here above is the script of the view in opened mode
+
+
+-- Truncate Deletes all records from the table except its columns
+Truncate table [dbo].[AVG_Title_Table]
+
+Insert into [dbo].[AVG_Title_Table]
+	Select *
+	From [dbo].[V_AvgSalaries]
+
+-- Now we can see again the data, it's useful to always be aware of the number of columns that will
+--be transfered to the new table, so that you can match them according to the number and the column purpose.
+Select c.* 
+	From [dbo].[AVG_Title_Table] as c
+
+
+
+Step 7:
+Create Procedure LoopingTable_Load
+AS
+
+/*****************************************************************************************************************
+NAME:   Data_Science_MM
+PURPOSE: My script purpose...
+
+MODIFICATION LOG:
+Ver      Date        Author        Description
+-----   ----------   -----------   -------------------------------------------------------------------------------
+1.0     01/31/2025   MORONI           1. Script created for EC_IT143_DA database about stored procedures.
+                     MIRANDOLLI          
+
+RUNTIME: 
+1s
+
+NOTES: 
+ Script created to show what a stored procedure is and how we can create them, I will also be explaining the
+importance of using stored procedures and how they avoid redoing the work over and over again as well as
+protecting our codes against online injections.
+ 
+******************************************************************************************************************/
+
+-- Q1: How can I create a Procedure and what does it do?
+-- A1: A procedure is a pre-made work that we save for future use, it will rerun as many times as we want the same
+--coding so we can work faster and without the need to rewrite all the way down our codings 
+
+--SELECT GETDATE() AS my_date;
+
+	BEGIN
+
+		Truncate Table [dbo].[AVG_Title_Table]
+
+		Insert Into [dbo].[AVG_Title_Table]
+			 Select *
+			   From [dbo].[V_AvgSalaries]
+
+			 Select c.* 
+			   From [dbo].[AVG_Title_Table] as c
+
+	END;
+GO
+
+
+
+Step 8:
+EXEC  LoopingTable_Load
