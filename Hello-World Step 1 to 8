@@ -1,0 +1,216 @@
+--Step 1:
+What are the Customers without with no letter "A" within their names?
+
+
+
+Step 2:
+--This simple question is useful when we want to look after specific information, then using our creativity we
+--are able to create filters using the where condition and this way retrieve only the information searched.
+--That make things much easier when we turn ad hoc queries into stored procedures 
+--always the same query and run it over and over again as many times I want. This turns masssive workload in 
+--really shortened and quick codings that I can run multiple times without fearing with it will place an 
+--error or not. It won't because my coding has been already validated
+
+
+
+Step 3:
+-- There are 17 customers in total who do not have the letter A in their name.
+
+Select * From [dbo].[t_w3_schools_customers]
+
+Select *
+	From [dbo].[t_w3_schools_customers]
+	Where CustomerName not like '%A%'
+		Order By CustomerName;
+
+
+
+Step 4:
+Drop View if Exists View_Non_A;
+Go
+
+Create View View_Non_A
+AS
+
+/*****************************************************************************************************************
+NAME:  Hello_world_MM
+PURPOSE: Showcase the creation of table views
+
+MODIFICATION LOG:
+Ver      Date        Author        Description
+-----   ----------   -----------   -------------------------------------------------------------------------------
+1.0     01/30/2025   MORONI            1. Script for EC_IT143_DA W4.2 Step 4 
+					           MIRANDOLLI
+
+RUNTIME: 
+1s
+
+NOTES: 
+This script was created to help me always remember how to perform the following command in SQL Server as well as to 
+present my school work to teachers and the like
+ 
+******************************************************************************************************************/
+
+-- Q1: How do I create a Table View within SQL Server Management using my Ad Hoc queries?
+-- A1: I will show how easy it is to create a table view and its purpose is simply to help you show your
+--queries workload to anyone else without harming your coding, that's because they will only see the
+--information in View mode and any change to the table will be not permanent.
+
+
+Select Top 17 *
+	From [dbo].[t_w3_schools_customers]
+	Where CustomerName not like '%A%'
+		Order By CustomerName;
+
+SELECT GETDATE() AS my_date;
+
+-- Once I create a view, all I need to do is run the name of this view and it will get all the results from
+--the code I created earlier.
+-- The View itself is a table for visualization purposes only.
+
+
+
+Step 5.1:
+Select * Into NonACustomers From View_Non_A
+
+Select * From NonACustomers
+
+
+
+Step 5.2:
+USE [EC_IT143_DA]
+GO
+
+/****** Object:  Table [dbo].[NonACustomers]    Script Date: 01/02/2025 16:24:25 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[NonACustomers](
+	[CustomerID] [int] Primary Key NOT NULL,
+	[CustomerName] [varchar](20) NOT NULL,
+	[ContactName] [varchar](20),
+	[Address] [varchar](30) unique NOT NULL,
+	[City] [varchar](10) NOT NULL,
+	[Country] [varchar](16)Default 'USA' NOT NULL
+) ON [PRIMARY]
+GO
+
+
+
+
+Step 6:
+USE [EC_IT143_DA]
+GO
+
+/****** Object:  View [dbo].[Non_A_Customers]    Script Date: 30/01/2025 22:16:58 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+Create View [dbo].[View_Non_A]
+AS
+
+/*****************************************************************************************************************
+NAME:  Hello_world_MM
+PURPOSE: Showcase the creation of table views
+
+MODIFICATION LOG:
+Ver      Date        Author        Description
+-----   ----------   -----------   -------------------------------------------------------------------------------
+1.0     01/30/2025   MORONI            1. Script for EC_IT143_DA W4.2 Step 4 
+					           MIRANDOLLI
+
+RUNTIME: 
+1s
+
+NOTES: 
+This script was created to help me always remember how to perform the following command in SQL Server as well as to 
+present my school work to teachers and the like
+ 
+******************************************************************************************************************/
+
+-- Q1: How do I create a Table View within SQL Server Management using my Ad Hoc queries?
+-- A1: I will show how easy it is to create a table view and its purpose is simply to help you show your queries 
+--workload to anyone else without harming your coding, that's because they will only see the information in View mode
+--and any change of the data will be not permanent.
+
+--Table View
+Select Top 17 *
+	From [dbo].[t_w3_schools_customers]
+	Where CustomerName not like '%A%'
+		Order By CustomerName;
+GO
+
+-- Here above is the script of the view in opened mode
+
+
+-- Truncate Deletes all records from the table except its columns
+Truncate table [dbo].[NonACustomers]
+
+Insert into [dbo].[NonACustomers]
+	Select *
+	From [dbo].[View_Non_A]
+
+-- Now we can see again the data, it's useful to always be aware of the number of columns that will
+--be transfered to the new table, so that you can match them according to the number and the column purpose.
+Select a.* 
+	From [dbo].[NonACustomers] as a
+
+
+
+
+
+Step 7: 
+Create Procedure Pcd_No_A
+AS
+
+/*****************************************************************************************************************
+NAME:   Hello-World_MM
+PURPOSE: My script purpose...
+
+MODIFICATION LOG:
+Ver      Date        Author        Description
+-----   ----------   -----------   -------------------------------------------------------------------------------
+1.0     01/31/2025   MORONI           1. Script created for EC_IT143_DA database about stored procedures.
+                     MIRANDOLLI          
+
+RUNTIME: 
+1s
+
+NOTES: 
+ Script created to show what a stored procedure is and how we can create them, I will also be explaining the
+importance of using stored procedures and how they avoid redoing the work over and over again as well as
+protecting our codes against online injections.
+ 
+******************************************************************************************************************/
+
+-- Q1: How can I create a Procedure and what does it do?
+-- A1: A procedure is a pre-made work that we save for future use, it will rerun as many times as we want the same
+--coding so we can work faster and without the need to rewrite all the way down our codings 
+
+--SELECT GETDATE() AS my_date;
+
+	BEGIN
+
+		Truncate Table [dbo].[NonACustomers]
+
+		Insert Into [dbo].[NonACustomers]
+			 Select *
+			   From [dbo].[View_Non_A]
+
+			 Select c.* 
+			   From [dbo].[NonACustomers] as c
+
+	END;
+GO
+
+
+
+
+Step 8:  
+EXEC  Pcd_No_A
