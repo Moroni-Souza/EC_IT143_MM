@@ -13,51 +13,219 @@ RUNTIME:
 Xs
 
 NOTES: 
-THIS SCRIPT WAS BUILT to facilitate my answers to questions related to my community, it contains 4 questions,
+This Script was built to facilitate my answers to questions related to my community, it contains 4 questions,
 3 created by me and one created by another student, it was made to help find valuable data for the growth of
 the school and to help find the key points of interest of everyone involved with the entity.
  
 ******************************************************************************************************************/
 
-Select * From StudentPerformanceFactors
+
 
 -- Q1: Parents want to know how to help their children achieve better results in school. What is the level
 -- of development of each student when we compare students from public and private schools according to the 
 -- statistics presented, taking into account the hours of study, number of classes attended and parental
 -- involvement. What is the difference in the results of each student?
 
--- A1: Question goes on the previous line, intoduction to the answer goes on this line...
+Alter Table StudentPerformanceFactors
+Alter Column Previous_Scores int
+
+Alter Table StudentPerformanceFactors
+Alter Column exam_score int
+
+Alter Table StudentPerformanceFactors
+Alter Column hours_studied int
+
+Alter Table StudentPerformanceFactors
+Alter Column Attendance int
+
+Select 
+	School_Type,
+	avg(hours_studied) as StudyHours,
+	avg(attendance) as Attendance,
+	parental_involvement,
+	avg(Previous_Scores) as PreviousAVG_Score,
+	avg(exam_score) as Exam_avg_Score
+From 
+	StudentPerformanceFactors
+	Group By 
+		School_Type,
+		parental_involvement
+
+-- A1: The difference is minimal, but the drop in grades of students from both private and public
+-- schools is notable, with their grades dropping by 10% compared to previous scores.
+-- Parental involvement show a little improvement in grades.
+-- They also need to look for new approaches to improve their students' grades using statistics
+-- such as New Rescources, Motivation Level, Tutoring, Sleep Hours and Teacher Quality
 
 
-
--- Q2 What is the success rate of former students in the professional field and what feedback are companies
--- offering schools to improve and strengthen students in the knowledge most sought after by the job market, what
--- is the employment rate of all schools in the group?
-
--- A2
+=====================================================================================================================
 
 
--- Q3 Why students have such a huge difficulty in getting better grades, what are the internal and external
+-- Q2 Why students have such a huge difficulty in getting better grades, what are the internal and external
 -- reasons that are affecting each student's results, are they happy studying here? Which influences are having
 -- an effect on them and which are not. What does the school need to do to ensure student happiness and
 -- satisfaction while also shortening the learning process and following the schollar annual grid?
 
--- A3
+Select  Motivation_level,
+		Avg(Previous_Scores) as FirstScore,
+		Avg(Exam_Score) as SecondScore
+From StudentPerformanceFactors
+	Group By Motivation_Level
+
+-- Study more hours has helped improve the SecondScore of Students
+Select  Hours_Studied, 
+		Avg(Previous_Scores) as FirstScore,
+		Avg(Exam_Score) as SecondScore
+From StudentPerformanceFactors
+	Group By Hours_Studied
+	Order By Hours_Studied
+
+-- Attendance has improved the SecondScore too
+Select  Attendance,                         
+		Avg(Previous_Scores) as FirstScore,
+		Avg(Exam_Score) as SecondScore
+From StudentPerformanceFactors
+	Group By Attendance
+	Order By Attendance
+
+-- Access to resource has changed the grades for the SecondScore
+Select  Access_to_Resources,                  
+		Avg(Previous_Scores) as FirstScore,
+		Avg(Exam_Score) as SecondScore
+From StudentPerformanceFactors
+	Group By Access_to_Resources
+	Order By Access_to_Resources
+	 
+-- Sleep more os less does not affect the results in any exam
+Select  Sleep_Hours,                          
+		Avg(Previous_Scores) as FirstScore,
+		Avg(Exam_Score) as SecondScore
+From StudentPerformanceFactors
+	Group By Sleep_Hours
+	Order By Sleep_Hours
+
+-- Family Income does not affect the results
+Select  Family_Income, 
+		Avg(Previous_Scores) as FirstScore,
+		Avg(Exam_Score) as SecondScore
+From StudentPerformanceFactors
+	Group By Family_Income
+	Order By Family_Income
+
+-- Teacher Quality does not affect the results
+Select  Teacher_Quality,     
+		Avg(Previous_Scores) as FirstScore,
+		Avg(Exam_Score) as SecondScore
+From StudentPerformanceFactors
+	Group By Teacher_Quality
+	Order By Teacher_Quality
 
 
--- Q4 Parents are having doubts about the school's values ​​and whether it is really worth leaving their students
+-- A2  Students are on a similar line of progress and the best grades are going to those with a little more 
+-- resources, more attendence and with more hours of study and best education, but most received average grades and did not take 
+-- dvantage of most of the available resources.
+
+===================================================================================================================
+
+-- Q3 Parents are having doubts about the school's values ​​and whether it is really worth leaving their students
 -- in our care. What evidence is there that students will benefit from their time studying here and that our
 -- methods will help them solve everyday problems and achieve their life and career plans and goals? Highlight
 -- the company/school's main strengths and prove the results achieved with numbers and past experiences.
 
--- A4
+
+Select
+	Count(previous_scores) as FirstScore
+From StudentPerformanceFactors
+	Where  Previous_scores between 70 and 100
+
+Select
+	Count(exam_score) as SecondScore
+From StudentPerformanceFactors
+	Where exam_score between 70 and 100
 
 
--- Q5 Another student Question: What factors contribute to the academic success of students in the community,
+-- Tutoring has improved the results
+Select
+	Tutoring_Sessions,	
+	avg(previous_scores) as FirstScore,
+	avg(exam_score) as SecondScore
+From StudentPerformanceFactors
+	Group by
+	Tutoring_Sessions
+	Order By
+	Tutoring_Sessions;
+
+-- All our teachers achieve enormous results with our children
+Select
+	Teacher_Quality,                    
+	max(previous_scores) as FirstScore,
+	max(exam_score) as SecondScore
+From StudentPerformanceFactors
+	Group by
+	Teacher_Quality
+
+
+-- The same happens with our peers
+Select
+	Peer_Influence,							
+	max(previous_scores) as FirstScore,
+	max(exam_score) as SecondScore
+From StudentPerformanceFactors
+	Group by 
+	Peer_Influence
+	Order By 
+	Peer_Influence
+
+
+-- Students from all over are getting good grades, so we see that distance is not a problem for our school
+Select
+	Distance_from_Home,  												
+	max(previous_scores) as FirstScore,  
+	max(exam_score) as SecondScore
+From StudentPerformanceFactors
+	Group by
+	Distance_from_Home
+	Order by
+	Distance_from_Home
+
+-- A3  Our school offers quality tutoring, peers and teachers to help your son and daughter develop and have
+-- a successful career, we have seen this frequently in the results presented by the work of our facilitators.
+-- 60% of our students scored between 70 and 100 while other 40% are not far behind they have scored between
+-- 60 and 69
+
+=====================================================================================================================
+
+-- Q4 Another student Question: What factors contribute to the academic success of students in the community,
 -- and how do these factors vary between students from different socioeconomic backgrounds?
 
--- A5
+Select 
+	School_Type,
+	Access_to_Resources,
+	AVG(Previous_Scores) as PS,
+	AVG(Exam_Score) as ES
+From StudentPerformanceFactors
+Group By 
+	School_Type,
+	Access_to_Resources
 
 
+Select 
+	School_Type,
+	Hours_Studied as Hours_perWeek,
+	AVG(Previous_Scores) as PS,
+	AVG(Exam_Score) as ES
+From StudentPerformanceFactors
+Group By 
+	School_Type,
+	Hours_Studied
+Order By 
+	School_Type
+
+
+-- A4  Socioeconomic factors did affect it, but not to a large extent. We see that among the 6,000 students,
+-- many in the two education categories stand out more than others within their groups. Despite the differences
+-- in resources and benefits, students manage to stand out due to their personal intelligence and hard work.
+
+=====================================================================================================================
 
 SELECT GETDATE() AS my_date;
