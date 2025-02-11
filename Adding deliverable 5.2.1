@@ -18,17 +18,57 @@ information needed to improve our business processes.
  
 ******************************************************************************************************************/
 
+Select * Into table_lessprofits From view_lessprofits
+
 Select * From [dbo].[data_science_salaries2024]
 
+===================================================================================================================
 -- Q1: We want to improve our physical structure to help with the convenience of our employees and to present our
 --business to all our customers. What is the best physical work structure for a company according to the demand
 --for service requests, separated by category and need, what material is missing or needs to be replaced and what
 --is the average balance of money invested to solve these deficiencies? How long will it take to get the new 
 --companies ready?
 
--- A1: Question goes on the previous line, intoduction to the answer goes on this line...
+Create View view_smallsize as
+Select company_location,
+	   company_size,
+	   sum(salary_in_usd) as EmployeeEarning
+From [dbo].[data_science_salaries2024]
+	Group by company_location,
+			 company_size
+		Having company_size = 'small';
+----------------------------------------------
+Create view view_lessprofits as
+Select company_location,
+	   company_size,
+	   Sum(salary_in_usd) as EmployeeEarning
+From [dbo].[data_science_salaries2024]
+	Group by company_location,
+			 company_size
+		Having sum(salary_in_usd) <=100000
+			Order By employeeearning;
+------------------------------------------------
+Select a.company_location,
+	   a.company_size,
+	   a.employeeearning 
+From table_lessprofits as a
+	Inner Join table_smallsize as b
+	ON a.company_size = b.company_size
+		Where a.company_size = 'small'
+		Group by a.company_location,
+				 a.company_size,
+				 a.employeeearning;
 
+-- A1: According to the information provided by our companies records we cannot know what are the demands and
+--services, but we do know where we were receiveing more income per employees, based on those information
+--we can conclude that companies located in the countries: Ghana, Philippines, Ecuador, Hungary, Moldova, Turkey
+--Greece, Honduras, Malta, Thailand have less revenue due to lack of material, we
+--have plans to purchase new material within the established period of 2 years for the smallest companies which
+--are 23 counted so far, this approach is because we notice all did not got great incomes in the last 4 years,
+--a cost balance will be made along with a plan so that expenses can be divided in monthly payments according
+--to our company finantial conditions.
 
+===================================================================================================================
 
 -- Q2 Understanding the market trend is key to our company’s decision-making, so: find out the current market
 --trends and which channels are receiving the most orders, make a list from largest to smallest according to
@@ -36,32 +76,148 @@ Select * From [dbo].[data_science_salaries2024]
 --and find the real or approximate reason for these results.
 
 
---A2
+With work_model_table as
+(
+Select company_location,
+	   work_models,
+	   Sum(salary_in_usd) as IncomeTotal
+From [dbo].[data_science_salaries2024]
+Group by work_models,
+	   company_location)
+Select company_location,
+	   work_models,
+	   IncomeTotal
+From work_model_table 
+Where work_models = 'Hybrid' and IncomeTotal > 1000000
+Order By IncomeTotal desc;
+-------------------------------------------------------
+With work_model_table as
+(
+Select company_location,
+	   work_models,
+	   Sum(salary_in_usd) as IncomeTotal
+From [dbo].[data_science_salaries2024]
+Group by work_models,
+	   company_location) 
+Select company_location,
+	   work_models,
+	   IncomeTotal
+From work_model_table 
+Where work_models = 'Remote' and IncomeTotal > 1000000
+Order By IncomeTotal desc;
+-------------------------------------------------------
+With work_model_table as
+(
+Select company_location,
+	   work_models,
+	   Sum(salary_in_usd) as IncomeTotal
+From [dbo].[data_science_salaries2024]
+Group by work_models,
+	   company_location)
+Select company_location,
+	   work_models,
+	   IncomeTotal
+From work_model_table 
+Where work_models = 'On-site' and IncomeTotal > 1000000
+Order By IncomeTotal desc;
+--------------------------------------------------------
+
+Select work_models,
+	   Sum(salary_in_usd) as Revenue
+From [dbo].[data_science_salaries2024]
+Group by work_models;
+	     
+
+-- A2  The channel with the highest entry is On-site, the list of countries with the highest
+-- entry within the on-site channel are United States, United Kingdom, Canada, Germany, Australia, Spain
+-- The three areas with the largest entries all come from the United States, both on-site and remote
+-- and hybrid as well.
+
+===================================================================================================================
 
 
-
--- Q3 Shareholders want to hold a meeting to understand the growth of our company and decide whether to
---continue supporting us. Create a presentation of data that shows all dividends, payments and expenses.
---Explain how the operation is monitored, outlining a line of forecasts for the next work cycle with the 
---possible choices to be made and the possible risks that may arise. What benefits will be obtained by
---investing in our company?
-
---A3
-
-
-
-
---Q4 "Our manager wants a growth report over the past few years to understand what implementations can be made.
+--Q3 "Our manager wants a growth report over the past few years to understand what implementations can be made.
 --“Find the four hubs with the highest concentration of employees; find three locations with potential for
 --growth in new employees and new branches.
+Select * From [dbo].[data_science_salaries2024]
 
---A4
+With table_employeeamount as 
+(
+Select count(job_title) as EmployeesAmount,
+	   company_location
+From [dbo].[data_science_salaries2024]
+	Group By company_location
+)
+	Select top 4 company_Location,
+			     EmployeesAmount
+		From table_employeeamount
+			Order By EmployeesAmount desc;
+-------------------------------------------------
+With table_incometotal as
+(
+Select 
+	count(job_title) as EmployeesAmount,
+	company_location, 
+	sum(salary_in_usd) as Total
+From [dbo].[data_science_salaries2024]
+	Group By company_location)
+
+Select 
+	company_location,
+	EmployeesAmount,
+	Total
+From 
+	table_incometotal
+Order by 
+	Total desc
+
+Create View 
+	view_avg_income as
+Select 
+	count(job_title) as EmployeesAmount,
+	company_location, 
+	sum(salary_in_usd) as Total
+From [dbo].[data_science_salaries2024]
+	Group By company_location
+
+Select top 3 
+	company_location,
+	Total / employeesamount as income_per_employee
+From table_avg_income
+	Order By income_per_employee desc
 
 
--- Q5 Another Student Question: What skills and qualifications are most in demand by employers in the data
---science industry, and how do these demands vary by location and industry sector?
 
--- A5
+-- A3 the four hubs with the greatest number of employees are: United States, United Kingdom, Canada and Germany.
+-- Qatar, Israel and Puerto Rico are getting the most income per employee than we could hire more employees there,
+-- these are the three best places to grow our company.
+
+
+-- Q4 Another Student Question: What skills and qualifications are most in demand by employers in the data
+-- science industry, and how do these demands vary by location and industry sector?
+Select * From [dbo].[data_science_salaries2024]
+
+Select
+    experience_level as Expertise, 
+    Count(experience_level) as Employees
+From [dbo].[data_science_salaries2024]
+	Group by experience_level
+	Order by employees Desc;
+--------------------------------------
+Select 
+	company_location,
+	experience_level,
+	Count(experience_level) as Employees
+From [dbo].[data_science_salaries2024]
+	Group By company_location,
+			 Experience_level
+  Order by Experience_level;
+  --Order by Employees Desc;
+
+
+-- A4  The Senior-level is the most sought after in the sector, with 4105 employees hires so far.
+--  Above we have a query to see the list of employees separated by country and expertise, this way we 
+-- can see the difference between countries of people hired and which countries have the highest demand.
 
 
 
