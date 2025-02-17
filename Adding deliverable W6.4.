@@ -1,0 +1,32 @@
+Name: Moroni Mirandolli
+Scrip Name: Improving Performance Indexes
+/*****************************************************************************************************************
+NAME:    Improving_Performance_Indexes
+PURPOSE: Understand the concept of indexes and how to create them
+
+MODIFICATION LOG:
+Ver      Date        Author        Description
+-----   ----------   -----------   -------------------------------------------------------------------------------
+1.0     02/17/2025   Moroni            1. Creation and Learning from Missing Indexes
+                     Mirandolli
+    
+RUNTIME: 
+1s
+
+NOTES: 
+Here we see the query in order to discover missing indexes and how to create these missing indexes 
+to solve performance problems. In fact any poor query will make SQL suggest you to create indexes.
+ 
+******************************************************************************************************************/
+
+-- Any query to check sql performance in searching
+Select t.City
+From [Person].[Address] as t
+Where t.City = 'Hayward'
+
+
+-- Creating my nonclustered index to the table person.address
+USE [AdventureWorks2022]
+GO
+CREATE NONCLUSTERED INDEX IX_nonC_index
+ON Person.Address ([City])
